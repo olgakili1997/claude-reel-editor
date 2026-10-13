@@ -8,6 +8,13 @@ PRESETS = {
     "fast":    {"speed": 1.15, "pause_min": 0.2, "air": 0.05, "fillers": ["um", "uh", "umm", "uhm", "erm", "er", "ah", "hmm", "mm"]},
 }
 
+def whisper_args(brand):
+    """Model + language flags for `hyperframes transcribe`. English uses the small English-only model (fast);
+    any other brand.json "language" (e.g. "ru") needs the multilingual large-v3 model, which the .en models cannot do."""
+    lang = (brand.get("language") or "en").lower()
+    if lang.startswith("en"): return ["--model", "small.en"]
+    return ["--model", "large-v3", "--language", lang]
+
 def pacing(brand):
     p = dict(PRESETS.get(brand.get("pacing", "natural"), PRESETS["natural"]))
     if brand.get("speed"): p["speed"] = float(brand["speed"])

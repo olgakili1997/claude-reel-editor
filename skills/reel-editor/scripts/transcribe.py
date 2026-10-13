@@ -46,7 +46,11 @@ if k:
     print(f"transcribed with ElevenLabs {model}: {len(words)} words")
 else:
     d = out.parent / (out.stem + "_whisper")
-    subprocess.run(["npx", "-y", "hyperframes", "transcribe", str(src), "-d", str(d), "--json", "--model", "small.en"], capture_output=True, check=True)
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from pacing import whisper_args
+    bj = Path(os.environ.get("REELS_HOME", "~/reels")).expanduser() / "brand.json"
+    args = whisper_args(json.load(open(bj)) if bj.exists() else {})
+    subprocess.run(["npx", "-y", "hyperframes", "transcribe", str(src), "-d", str(d), "--json", *args], capture_output=True, check=True)
     words = json.load(open(d / "transcript.json"))
-    print(f"transcribed with local Whisper (no ElevenLabs key): {len(words)} words - timing can drift ~0.3 s")
+    print(f"transcribed with local Whisper (no ElevenLabs key, {args[1]}): {len(words)} words - timing can drift ~0.3 s")
 json.dump(words, open(out, "w"))

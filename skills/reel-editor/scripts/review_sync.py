@@ -15,7 +15,7 @@ from pacing import pacing
 HERE = Path(__file__).resolve().parent
 CORE = HERE.parent / "review" / "core.js"
 HOME = Path(os.environ.get("REELS_HOME", "~/reels")).expanduser()
-norm = lambda s: re.sub(r"[^a-z0-9]", "", s.lower())
+norm = lambda s: re.sub(r"[^\w]", "", s.lower())   # \w keeps letters in any script (Cyrillic, accents), drops punctuation
 
 def raw_clip(reel):   # the raw clip's name keeps its extension (raw.mov from an iPhone, raw.mp4 from Android)
     return next(iter(sorted(reel.glob("raw.*"))), reel / "raw.mov")
