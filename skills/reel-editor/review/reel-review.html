@@ -579,7 +579,11 @@ function renderAll() {
   if (!db) { pill("This view can't load the reel. Open it from your claude.ai link.", true); $("#reelname").textContent = "Not connected."; return; }
   try {
     const rs = await db.doc("reel/current").get();
-    if (!rs.exists) { $("#reelname").textContent = "No reel loaded yet. Ask Claude to load one."; pill("Nothing to review", true); return; }
+    if (!rs.exists) {   // opened before Claude wrote the reel: reload on its own the moment the data lands
+      $("#reelname").textContent = "No reel loaded yet. Ask Claude to load one."; pill("Nothing to review", true);
+      db.doc("reel/current").onSnapshot(s => { if (s.exists) location.reload(); }, () => {});
+      return;
+    }
     R = rs.data();
     if (R.fonts) {   // brand fonts, so the caption preview uses the real faces
       const css = [["rb", R.fonts.body], ["ra", R.fonts.accent]].filter(f => f[1]).map(([n, u]) => `@font-face{font-family:${n};src:url(${u});font-display:swap}`).join("");
